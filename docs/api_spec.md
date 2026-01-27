@@ -289,7 +289,7 @@ GET /game/watch?game_id=a1b2c3d4-e5f6-7890-abcd-ef1234567890-watch
     },
     ...
   ],
-  "bullets_in_flight": [
+  "bullets": [
     {
       "shooter_id": "agent_cautious_1",
       "position": {"x": 20, "y": 25},

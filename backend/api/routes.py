@@ -15,6 +15,7 @@ from api.game_service import (
     resume_existing_game,
     GameServiceError
 )
+from api.concurrent_limiter import check_concurrent_limit
 
 router = APIRouter(prefix="/game", tags=["game"])
 
@@ -22,6 +23,7 @@ router = APIRouter(prefix="/game", tags=["game"])
 @router.post("/new", response_model=NewGameResponse)
 async def create_game(db: Session = Depends(get_db)):
     """Create a new game."""
+    check_concurrent_limit(db)  # Check capacity
     try:
         return create_new_game(db)
     except GameServiceError as e:
