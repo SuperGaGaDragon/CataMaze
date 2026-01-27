@@ -5,7 +5,7 @@
 import React, { useRef } from 'react';
 import { TerminalLauncher } from '@patch/modules/terminal';
 import { Observation } from './apiClient';
-import { createGameCommands } from './gameCommands';
+import { createCataMazeCommand } from './commands/catamaze';
 
 interface GameState {
   gameId: string | null;
@@ -20,12 +20,12 @@ export function CataMazeTerminal() {
     queueSize: 0,
   });
 
-  const commands = createGameCommands(gameState);
+  const cataMazeCommand = createCataMazeCommand(gameState);
 
   return (
     <TerminalLauncher
       initialSystem="dos"
-      customCommands={commands}
+      customCommands={[cataMazeCommand]}
     />
   );
 }
