@@ -2,7 +2,7 @@
  * CataMaze API Client
  */
 
-const BASE_URL = process.env.REACT_APP_API_URL || 'https://catamaze.catachess.com';
+const BASE_URL = process.env.REACT_APP_API_URL || 'https://catamazeapi.catachess.com';
 
 export interface Position {
   x: number;
