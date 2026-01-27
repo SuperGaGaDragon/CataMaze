@@ -1,0 +1,5 @@
+/* CataMaze UI Main Styles */
+
+@import url('layout.css');
+@import url('game-area.css');
+@import url('controls.css');
