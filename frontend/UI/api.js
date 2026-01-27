@@ -3,7 +3,7 @@
  */
 
 // API Configuration
-export const API_BASE_URL = 'http://localhost:8000';
+export const API_BASE_URL = 'https://catamaze.catachess.com';
 
 // API Call Helper
 export async function apiCall(endpoint, method = 'GET', body = null) {
