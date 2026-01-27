@@ -1,5 +1,10 @@
 CataMaze游戏：
 
+一些env 说明
+一些环境变量：
+DATABASE_URL = postgresql://postgres:xkwJlPWNpIYfmsjaPQoRkFJtVLdsrcGW@postgres.railway.internal:5432/railway
+存储都在这里，到时候自动建表
+
 功能简介
 
 - 终端游戏，暂时部署于desktop/catachess/patch/modules/terminal伪终端，不上真终端。
