@@ -3,6 +3,7 @@ CataMaze Backend Entry Point
 """
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from api.routes import router as game_router
 
 app = FastAPI(
     title="CataMaze API",
@@ -19,13 +20,28 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Register routers
+app.include_router(game_router)
+
 @app.get("/")
 async def root():
-    return {"message": "CataMaze API is running"}
+    return {
+        "message": "CataMaze API is running",
+        "version": "0.1.0",
+        "endpoints": {
+            "health": "/health",
+            "docs": "/docs",
+            "game": "/game/*"
+        }
+    }
 
 @app.get("/health")
 async def health():
-    return {"status": "healthy"}
+    return {
+        "status": "healthy",
+        "service": "catamaze-api",
+        "version": "0.1.0"
+    }
 
 if __name__ == "__main__":
     import uvicorn
