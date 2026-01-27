@@ -12,30 +12,12 @@ import {
   handleObserve,
   handleResume,
 } from './handlers';
+import { renderHelp } from '../renderer';
 
 interface GameState {
   gameId: string | null;
   observation: Observation | null;
   queueSize: number;
-}
-
-function showHelp(): string[] {
-  return [
-    '=== CataMaze Commands ===',
-    '',
-    'catamaze new              - Start a new game',
-    'catamaze action <key>     - Queue an action',
-    'catamaze tick             - Execute one tick',
-    'catamaze clear            - Clear action queue (ESC)',
-    'catamaze observe          - View current state',
-    'catamaze resume <id>      - Resume a game',
-    '',
-    'Movement keys: w/a/s/d or arrow keys',
-    'Shooting keys: i/j/k/l (up/left/down/right)',
-    'Wait: space or .',
-    '',
-    'Example: catamaze action w',
-  ];
 }
 
 export function createCataMazeCommand(gameStateRef: { current: GameState }): Command {
@@ -48,7 +30,7 @@ export function createCataMazeCommand(gameStateRef: { current: GameState }): Com
       const subcommand = ctx.args[0]?.toLowerCase();
 
       if (!subcommand || subcommand === 'help') {
-        return { output: showHelp() };
+        return { output: renderHelp() };
       }
 
       switch (subcommand) {

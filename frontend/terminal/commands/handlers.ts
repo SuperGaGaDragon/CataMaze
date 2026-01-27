@@ -3,6 +3,12 @@
  */
 import { apiClient, Observation } from '../apiClient';
 import type { CommandResult } from '@patch/modules/terminal/types';
+import {
+  renderGameState,
+  renderEventLog,
+  renderGameOver,
+  renderHelp,
+} from '../renderer';
 
 interface GameState {
   gameId: string | null;
@@ -27,8 +33,6 @@ export const keyToAction: Record<string, string> = {
   '.': 'WAIT',
 };
 
-export const renderVision = (vision: string[][]): string[] => vision.map(row => row.join(' '));
-
 export async function handleNew(gameStateRef: { current: GameState }): Promise<CommandResult> {
   try {
     const response = await apiClient.createGame();
@@ -42,11 +46,7 @@ export async function handleNew(gameStateRef: { current: GameState }): Promise<C
         '=== NEW GAME STARTED ===',
         `Game ID: ${response.game_id}`,
         '',
-        `HP: ${response.observation.hp}  Ammo: ${response.observation.ammo}`,
-        `Position: (${response.observation.position.x}, ${response.observation.position.y})`,
-        '',
-        'Vision:',
-        ...renderVision(response.observation.vision),
+        ...renderGameState(response.observation),
         '',
         'Use "catamaze action <key>" to move/shoot, "catamaze tick" to execute.',
       ],
@@ -94,26 +94,12 @@ export async function handleTick(gameStateRef: { current: GameState }): Promise<
     gameStateRef.current.observation = response.observation;
     gameStateRef.current.queueSize = response.queue_size;
     const obs = response.observation;
-    const output = [
-      `=== TICK ${response.tick} ===`,
-      `HP: ${obs.hp}  Ammo: ${obs.ammo}  Queue: ${response.queue_size}`,
-      `Position: (${obs.position.x}, ${obs.position.y})`,
-    ];
+    const output = [...renderGameState(obs, response.tick)];
     if (response.events.length > 0) {
-      output.push('', 'Events:');
-      response.events.forEach(e => output.push(`  ${e}`));
+      output.push('', ...renderEventLog(response.events));
     }
-    if (obs.last_sound) {
-      output.push('', `Sound: ${obs.last_sound}`);
-    }
-    output.push('', 'Vision:', ...renderVision(obs.vision));
     if (obs.game_over) {
-      output.push('', '=== GAME OVER ===');
-      if (obs.won) {
-        output.push('YOU WON! Congratulations!');
-      } else if (!obs.alive) {
-        output.push('You died. Try "catamaze new" to play again.');
-      }
+      output.push(...renderGameOver(obs.won, obs.alive));
     }
     return { output };
   } catch (error: any) {
@@ -146,12 +132,8 @@ export async function handleObserve(gameStateRef: { current: GameState }): Promi
     return {
       output: [
         '=== CURRENT STATE ===',
-        `HP: ${obs.hp}  Ammo: ${obs.ammo}  Tick: ${obs.time}`,
-        `Position: (${obs.position.x}, ${obs.position.y})`,
-        `Alive: ${obs.alive}  Won: ${obs.won}`,
         '',
-        'Vision:',
-        ...renderVision(obs.vision),
+        ...renderGameState(obs),
       ],
     };
   } catch (error: any) {
@@ -178,12 +160,9 @@ export async function handleResume(
       output: [
         '=== GAME RESUMED ===',
         `Game ID: ${response.game_id}`,
-        `HP: ${obs.hp}  Ammo: ${obs.ammo}  Tick: ${obs.time}`,
-        `Position: (${obs.position.x}, ${obs.position.y})`,
         `Queue size: ${response.queue_size}`,
         '',
-        'Vision:',
-        ...renderVision(obs.vision),
+        ...renderGameState(obs),
       ],
     };
   } catch (error: any) {
