@@ -48,7 +48,7 @@ export async function handleNew(gameStateRef: { current: GameState }): Promise<C
         '',
         ...renderGameState(response.observation),
         '',
-        'Use "catamaze action <key>" to move/shoot, "catamaze tick" to execute.',
+        'Type "catamaze action <keys>" to queue actions, "catamaze tick" to execute.',
       ],
     };
   } catch (error: any) {
@@ -66,17 +66,32 @@ export async function handleAction(
   if (!key) {
     return { output: ['Usage: catamaze action <key>', 'Keys: w/a/s/d, i/j/k/l, space'], error: true };
   }
-  const action = keyToAction[key.toLowerCase()];
-  if (!action) {
-    return { output: [`Unknown key: ${key}`, 'Valid keys: w/a/s/d, i/j/k/l, space'], error: true };
+  const keys = key.split('');
+  const actions: string[] = [];
+  const invalidKeys: string[] = [];
+  for (const k of keys) {
+    const action = keyToAction[k.toLowerCase()];
+    if (action) {
+      actions.push(action);
+    } else if (k !== ' ') {
+      invalidKeys.push(k);
+    }
+  }
+  if (invalidKeys.length > 0) {
+    return { output: [`Invalid keys: ${invalidKeys.join(', ')}`, 'Valid keys: w/a/s/d, i/j/k/l, space'], error: true };
+  }
+  if (actions.length === 0) {
+    return { output: ['No valid actions provided'], error: true };
   }
   try {
-    const response = await apiClient.submitAction(gameStateRef.current.gameId, action);
-    gameStateRef.current.queueSize = response.queue_size;
+    for (const action of actions) {
+      const response = await apiClient.submitAction(gameStateRef.current.gameId, action);
+      gameStateRef.current.queueSize = response.queue_size;
+    }
     return {
       output: [
-        `Action queued: ${action}`,
-        `Queue size: ${response.queue_size}`,
+        `${actions.length} action(s) queued`,
+        `Queue size: ${gameStateRef.current.queueSize}`,
         'Use "catamaze tick" to execute.',
       ],
     };
@@ -128,13 +143,8 @@ export async function handleObserve(gameStateRef: { current: GameState }): Promi
   }
   try {
     const response = await apiClient.observeGame(gameStateRef.current.gameId);
-    const obs = response.observation;
     return {
-      output: [
-        '=== CURRENT STATE ===',
-        '',
-        ...renderGameState(obs),
-      ],
+      output: ['=== CURRENT STATE ===', '', ...renderGameState(response.observation)],
     };
   } catch (error: any) {
     return { output: [`Error: ${error.message}`], error: true };
@@ -155,17 +165,34 @@ export async function handleResume(
       observation: response.observation,
       queueSize: response.queue_size,
     };
-    const obs = response.observation;
     return {
       output: [
         '=== GAME RESUMED ===',
-        `Game ID: ${response.game_id}`,
-        `Queue size: ${response.queue_size}`,
+        `Game ID: ${response.game_id}, Queue: ${response.queue_size}`,
         '',
-        ...renderGameState(obs),
+        ...renderGameState(response.observation),
       ],
     };
   } catch (error: any) {
     return { output: [`Error: ${error.message}`], error: true };
   }
+}
+
+export async function handleQueue(gameStateRef: { current: GameState }): Promise<CommandResult> {
+  if (!gameStateRef.current.gameId) {
+    return { output: ['No active game.'], error: true };
+  }
+  const queueSize = gameStateRef.current.queueSize;
+  const status = queueSize > 0 ? `${queueSize} action(s) pending` : 'Queue is empty';
+  return {
+    output: [
+      '╔════════════════════════════════════╗',
+      '║         ACTION QUEUE               ║',
+      '╠════════════════════════════════════╣',
+      `║ Queue size: ${queueSize.toString().padEnd(22)} ║`,
+      `║ ${status.padEnd(34)} ║`,
+      '║ Each tick consumes 1 action        ║',
+      '╚════════════════════════════════════╝',
+    ],
+  };
 }

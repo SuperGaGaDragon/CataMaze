@@ -11,6 +11,7 @@ import {
   handleClear,
   handleObserve,
   handleResume,
+  handleQueue,
 } from './handlers';
 import { renderHelp } from '../renderer';
 
@@ -49,6 +50,9 @@ export function createCataMazeCommand(gameStateRef: { current: GameState }): Com
         case 'obs':
         case 'o':
           return handleObserve(gameStateRef);
+        case 'queue':
+        case 'q':
+          return handleQueue(gameStateRef);
         case 'resume':
         case 'r':
           return handleResume(gameStateRef, ctx.args[1]);
