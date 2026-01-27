@@ -34,10 +34,17 @@
 - api/*: All <200 lines
 - storage/*: All <200 lines
 - agents/*: All <200 lines
+- agents/rl/*: All <200 lines (encoder: 179, policy: 195, reward: 149, action_mask: 173, agent: 111)
 
 **Frontend**:
 - terminal/*: All <200 lines
 - UI/*: All <200 lines (modularized)
+
+**修复问题**:
+- ✅ DATABASE_URL硬编码修复 (改为SQLite默认值)
+- ✅ 所有缺失的RL文件已创建
+- ✅ Persona JSON配置文件已创建
+- ✅ 所有缺失文档已创建
 
 ### 3. ✅ 文档完善 (Stage 6E)
 **已创建文档**:
@@ -46,6 +53,13 @@
 - `docs/watch_mode.md` - Watch模式文档
 - `docs/data_models.md` - 数据模型说明
 - `docs/dev_rules.md` - 开发规范
+- `docs/personas.md` - Persona系统文档
+- `docs/errors.md` - 错误处理文档
+- `docs/logging.md` - 日志系统文档
+- `docs/performance.md` - 性能优化文档
+- `docs/release_notes.md` - 版本发布记录
+- `docs/questions.md` - 开发问题记录
+- `README.md` - 项目主文档
 
 **Summary 文档** (26个):
 - Stage 0: 5个 (0A-0E)
@@ -53,7 +67,7 @@
 - Stage 2: 5个 (2A-2E)
 - Stage 3: 5个 (3A-3E)
 - Stage 4: 2个 (4A, 4B+E)
-- Stage 5: 1个 (综合)
+- Stage 5: 1个 (已更新)
 - Stage 6: 1个 (本文件)
 
 ### 4. ✅ 项目结构
@@ -133,8 +147,10 @@ catamaze/
 - engine: ~800 lines
 - api: ~450 lines
 - storage: ~320 lines
-- agents: ~130 lines
-- **Total**: ~1,700 lines
+- agents: ~130 lines (base + human + registry)
+- agents/rl: ~807 lines (agent, encoder, policy, reward, action_mask)
+- personas: ~67 lines (JSON配置)
+- **Total**: ~2,574 lines
 
 **Frontend (TypeScript/JavaScript)**:
 - terminal: ~800 lines
@@ -143,10 +159,10 @@ catamaze/
 
 **Documentation (Markdown)**:
 - Implementation docs: ~5,000 lines
-- User docs: ~2,500 lines
-- **Total**: ~7,500 lines
+- User docs: ~4,500 lines (api_spec, terminal_usage, watch_mode, data_models, personas, errors, logging, performance, release_notes, questions, dev_rules, README)
+- **Total**: ~9,500 lines
 
-**Grand Total**: ~11,000 lines
+**Grand Total**: ~13,850 lines
 
 ## 性能优化
 - ✅ DOM只更新必要部分（UI）

@@ -1,0 +1,22 @@
+{
+  "name": "cautious",
+  "description": "Cautious agent that avoids conflict and prioritizes survival",
+  "behavior": {
+    "shoot_probability": 0.2,
+    "chase_probability": 0.3,
+    "explore_probability": 0.7,
+    "flee_probability": 0.8
+  },
+  "decision_weights": {
+    "attack": 0.1,
+    "chase": 0.2,
+    "explore": 0.4,
+    "flee": 0.3
+  },
+  "thresholds": {
+    "min_hp_to_attack": 4,
+    "max_distance_to_chase": 5,
+    "ammo_conservation": 0.8,
+    "flee_hp_threshold": 3
+  }
+}

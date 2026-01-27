@@ -8,9 +8,10 @@ from sqlalchemy.orm import sessionmaker, Session
 from typing import Generator
 
 # Read DATABASE_URL from environment
+# Default to SQLite for development if not set
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql://postgres:xkwJlPWNpIYfmsjaPQoRkFJtVLdsrcGW@postgres.railway.internal:5432/railway"
+    "sqlite:///./catamaze.db"
 )
 
 # Create engine

@@ -1,0 +1,22 @@
+{
+  "name": "explorer",
+  "description": "Explorer agent that focuses on map exploration and discovery",
+  "behavior": {
+    "shoot_probability": 0.1,
+    "chase_probability": 0.1,
+    "explore_probability": 0.9,
+    "flee_probability": 0.5
+  },
+  "decision_weights": {
+    "attack": 0.05,
+    "chase": 0.05,
+    "explore": 0.8,
+    "flee": 0.1
+  },
+  "thresholds": {
+    "min_hp_to_attack": 3,
+    "max_distance_to_chase": 3,
+    "ammo_conservation": 0.9,
+    "exploration_priority": 0.9
+  }
+}

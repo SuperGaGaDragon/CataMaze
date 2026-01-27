@@ -1,0 +1,20 @@
+{
+  "name": "aggressive",
+  "description": "Aggressive agent that actively hunts the player",
+  "behavior": {
+    "shoot_probability": 0.7,
+    "chase_probability": 0.8,
+    "explore_probability": 0.2,
+    "flee_probability": 0.1
+  },
+  "decision_weights": {
+    "attack": 0.6,
+    "chase": 0.3,
+    "explore": 0.1
+  },
+  "thresholds": {
+    "min_hp_to_attack": 2,
+    "max_distance_to_chase": 15,
+    "ammo_conservation": 0.3
+  }
+}

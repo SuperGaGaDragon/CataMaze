@@ -41,31 +41,95 @@ def create_agent(agent_type: str, entity_id: str, persona: Optional[str] = None)
 def list_agents() -> list
 ```
 
-### 4. ✅ backend/agents/personas.py (36 行)
-Agent Personas 定义：
+### 4. ✅ RL Agent 实现
+
+#### backend/agents/rl/agent.py (111 行)
+RLAgent 主类实现：
 ```python
-PERSONAS = {
-    "aggressive": {
-        "shoot_probability": 0.7,
-        "chase_probability": 0.8,
-        "explore_probability": 0.2,
-    },
-    "cautious": {...},
-    "explorer": {...},
+class RLAgent(Agent):
+    def __init__(self, entity_id: str, persona: str = "aggressive")
+    def decide_action(self, observation: dict) -> str
+    def update(self, reward: float, next_observation: dict, done: bool)
+    def reset(self)
+```
+
+#### backend/agents/rl/encoder.py (179 行)
+观察编码器：
+```python
+class ObservationEncoder:
+    def encode(self, observation: Dict) -> np.ndarray
+    def _encode_vision(self, vision_grid) -> List[float]
+    def _encode_self_state(self, observation) -> List[float]
+    def _encode_entities(self, entities) -> List[float]
+    def _encode_sounds(self, sounds) -> List[float]
+```
+
+#### backend/agents/rl/policy.py (195 行)
+动作选择策略：
+```python
+class Policy:
+    def select_action(self, features, valid_actions, persona_config) -> str
+    def _compute_action_scores(self, features, valid_indices, persona_config)
+    def _softmax(self, scores, temperature)
+    def update_epsilon(self, new_epsilon)
+```
+
+#### backend/agents/rl/reward.py (149 行)
+奖励计算器：
+```python
+class RewardCalculator:
+    def calculate(self, prev_obs, action, next_obs, done) -> float
+    def update_weights(self, new_weights)
+    def get_weights(self) -> Dict[str, float]
+```
+
+#### backend/agents/rl/action_mask.py (173 行)
+动作掩码生成：
+```python
+class ActionMask:
+    def get_valid_actions(self, observation: Dict) -> List[str]
+    def _can_move_north/south/east/west(self, position, vision) -> bool
+    def get_action_mask_binary(self, observation) -> List[int]
+```
+
+### 5. ✅ Persona系统 (JSON配置)
+
+#### backend/personas/aggressive.json (21 行)
+```json
+{
+  "name": "aggressive",
+  "behavior": {
+    "shoot_probability": 0.7,
+    "chase_probability": 0.8,
+    "explore_probability": 0.2,
+    "flee_probability": 0.1
+  },
+  "decision_weights": {...},
+  "thresholds": {...}
 }
 ```
 
-### 5. ✅ 接口可被 engine 调用
+#### backend/personas/cautious.json (23 行)
+谨慎型人格配置
+
+#### backend/personas/explorer.json (23 行)
+探索型人格配置
+
+### 6. ✅ 接口可被 engine 调用
 Agent接口设计与engine兼容：
 - `decide_action(observation)` → returns action string
 - `reset()` → optional state reset
-- 可扩展：未来可添加RL agents
+- RL Agent 支持训练接口 `update(reward, next_obs, done)`
 
 ## 文件行数检查
 - base.py: 31 行 ✓
 - human.py: 18 行 ✓
 - registry.py: 45 行 ✓
-- personas.py: 36 行 ✓
+- rl/agent.py: 111 行 ✓
+- rl/encoder.py: 179 行 ✓
+- rl/policy.py: 195 行 ✓
+- rl/reward.py: 149 行 ✓
+- rl/action_mask.py: 173 行 ✓
 
 全部符合 200 行限制。
 
@@ -73,28 +137,28 @@ Agent接口设计与engine兼容：
 - ✅ 抽象基类（ABC）
 - ✅ 类型提示（Type hints）
 - ✅ 可扩展设计
-- ✅ Persona 系统
+- ✅ Persona 系统 (JSON配置)
 - ✅ 注册机制
+- ✅ RL训练接口
+- ✅ 观察编码
+- ✅ 策略选择
+- ✅ 奖励塑形
+- ✅ 动作掩码
 
-## 可扩展性
-未来可添加：
-- `RLAgent` - 强化学习agent
-- `RandomAgent` - 随机移动agent
-- `GreedyAgent` - 贪心策略agent
+## RL Agent 架构
 
-注册示例：
-```python
-from backend.agents.registry import register_agent
-from backend.agents.rl_agent import RLAgent
-
-register_agent("rl", RLAgent)
-agent = create_agent("rl", "agent_rl_1", persona="aggressive")
+```
+RLAgent
+├── ObservationEncoder  # 观察 → 特征向量
+├── Policy              # 特征 → 动作选择
+├── RewardCalculator    # 转换 → 奖励信号
+└── ActionMask          # 状态 → 有效动作
 ```
 
 ## Stage 5 完全完成！
 
-**总代码**: 134 行
+**总代码**: ~920 行 (含RL实现)
 **架构**: 清晰、可扩展
-**状态**: 生产就绪
+**状态**: ✅ 完成
 
 继续 Stage 6: Polish and Optimization
