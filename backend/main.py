@@ -3,7 +3,7 @@ CataMaze Backend Entry Point
 """
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from api.routes import router as game_router
+from backend.api.routes import router as game_router
 
 app = FastAPI(
     title="CataMaze API",

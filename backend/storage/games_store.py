@@ -7,8 +7,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from typing import Optional, List, Dict, Any
 
-from storage.models import Game
-from engine.state import WorldState
+from backend.storage.models import Game
+from backend.engine.state import WorldState
 
 
 class GameStoreError(Exception):

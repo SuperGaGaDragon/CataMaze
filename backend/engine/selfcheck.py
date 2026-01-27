@@ -7,10 +7,10 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from engine.engine import GameEngine
-from engine.state import WorldState, create_entity
-from engine.actions import MOVE_RIGHT, MOVE_DOWN, SHOOT_RIGHT
-from maps.loader import load_map, get_start_and_exit
+from backend.engine.engine import GameEngine
+from backend.engine.state import WorldState, create_entity
+from backend.engine.actions import MOVE_RIGHT, MOVE_DOWN, SHOOT_RIGHT
+from backend.maps.loader import load_map, get_start_and_exit
 
 
 def print_sep(title):

@@ -8,16 +8,16 @@ import os
 # Add backend to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from maps.loader import load_map, get_start_and_exit
-from engine.actions import (
+from backend.maps.loader import load_map, get_start_and_exit
+from backend.engine.actions import (
     MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT,
     SHOOT_UP, SHOOT_LEFT, get_direction_vector, is_valid_action
 )
-from engine.position import (
+from backend.engine.position import (
     add_vector, is_in_bounds, is_walkable,
     can_move_to, get_next_position, manhattan_distance, is_in_range
 )
-from engine.local_map import extract_local_vision, get_vision_for_entity
+from backend.engine.local_map import extract_local_vision, get_vision_for_entity
 
 
 def print_vision(vision):

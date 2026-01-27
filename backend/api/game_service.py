@@ -4,12 +4,12 @@ Game service - business logic for game operations.
 from sqlalchemy.orm import Session
 from typing import Dict, Any
 
-from engine.state_factory import create_new_state
-from engine.engine import GameEngine
-from engine.observation import generate_observation
-from engine.actions import is_valid_action
-from storage.games_store import save_game, load_game, GameStoreError
-from storage.log_store import append_logs_batch, LogStoreError
+from backend.engine.state_factory import create_new_state
+from backend.engine.engine import GameEngine
+from backend.engine.observation import generate_observation
+from backend.engine.actions import is_valid_action
+from backend.storage.games_store import save_game, load_game, GameStoreError
+from backend.storage.log_store import append_logs_batch, LogStoreError
 
 
 class GameServiceError(Exception):

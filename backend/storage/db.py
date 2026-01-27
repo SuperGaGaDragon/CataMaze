@@ -53,7 +53,7 @@ def init_db():
     Initialize database by creating all tables.
     Call this on application startup.
     """
-    from storage.models import Game, Log  # Import models to register them
+    from backend.storage.models import Game, Log  # Import models to register them
     Base.metadata.create_all(bind=engine)
 
 

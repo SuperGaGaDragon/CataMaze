@@ -3,7 +3,7 @@ Database models for Game and Log tables.
 """
 from sqlalchemy import Column, String, Integer, Text, DateTime, Boolean
 from sqlalchemy.sql import func
-from storage.db import Base
+from backend.storage.db import Base
 
 
 class Game(Base):

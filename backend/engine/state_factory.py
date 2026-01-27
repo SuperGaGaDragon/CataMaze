@@ -5,9 +5,9 @@ import random
 import uuid
 from typing import List, Tuple, Optional
 
-from engine.state import WorldState, create_entity
-from maps.loader import load_map, get_start_and_exit
-from engine.position import is_walkable
+from backend.engine.state import WorldState, create_entity
+from backend.maps.loader import load_map, get_start_and_exit
+from backend.engine.position import is_walkable
 
 
 def find_random_walkable_position(

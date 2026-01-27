@@ -10,8 +10,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 # Use SQLite for testing
 os.environ["DATABASE_URL"] = f"sqlite:///{tempfile.gettempdir()}/catamaze_test.db"
 
-from storage.db import init_db, test_connection, SessionLocal, engine, Base
-from storage.models import Game, Log
+from backend.storage.db import init_db, test_connection, SessionLocal, engine, Base
+from backend.storage.models import Game, Log
 import json
 
 

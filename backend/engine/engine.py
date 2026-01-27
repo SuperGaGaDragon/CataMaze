@@ -3,15 +3,15 @@ Core game engine.
 Handles tick execution, action processing, and state updates.
 """
 from typing import List, Dict, Tuple, Optional
-from engine.state import WorldState, EntityState, BulletState
-from engine.actions import (
+from backend.engine.state import WorldState, EntityState, BulletState
+from backend.engine.actions import (
     is_move_action, is_shoot_action, is_wait_action,
     get_direction_vector, get_direction_name, WAIT
 )
-from engine.position import get_next_position, add_vector
-from engine.hp import take_damage, is_dead
-from engine.bullet import consume_ammo, recover_ammo, simulate_shot
-from engine.observation import generate_observation, generate_sound_for_entity
+from backend.engine.position import get_next_position, add_vector
+from backend.engine.hp import take_damage, is_dead
+from backend.engine.bullet import consume_ammo, recover_ammo, simulate_shot
+from backend.engine.observation import generate_observation, generate_sound_for_entity
 
 
 class GameEngine:

@@ -7,9 +7,9 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from engine.engine import GameEngine
-from engine.state_factory import create_new_state
-from engine.actions import MOVE_RIGHT, MOVE_DOWN, SHOOT_RIGHT, WAIT
+from backend.engine.engine import GameEngine
+from backend.engine.state_factory import create_new_state
+from backend.engine.actions import MOVE_RIGHT, MOVE_DOWN, SHOOT_RIGHT, WAIT
 
 
 def print_entity_status(world):

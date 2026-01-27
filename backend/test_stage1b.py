@@ -7,18 +7,18 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from engine.hp import (
+from backend.engine.hp import (
     create_hp_state, take_damage, is_alive, is_dead,
     get_hp_percentage, apply_hit
 )
-from engine.bullet import (
+from backend.engine.bullet import (
     create_ammo_state, can_shoot, consume_ammo,
     should_recover_ammo, recover_ammo,
     trace_bullet_path, simulate_shot
 )
-from engine.constants import INITIAL_HP, INITIAL_AMMO, MAX_AMMO
-from engine.actions import get_direction_vector, SHOOT_RIGHT, SHOOT_DOWN
-from maps.loader import load_map
+from backend.engine.constants import INITIAL_HP, INITIAL_AMMO, MAX_AMMO
+from backend.engine.actions import get_direction_vector, SHOOT_RIGHT, SHOOT_DOWN
+from backend.maps.loader import load_map
 
 
 def main():

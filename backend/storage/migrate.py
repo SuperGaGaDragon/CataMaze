@@ -8,7 +8,7 @@ import os
 # Add backend to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from storage.db import init_db, test_connection, DATABASE_URL
+from backend.storage.db import init_db, test_connection, DATABASE_URL
 
 
 def run_migrations():

@@ -4,10 +4,10 @@ Game API routes.
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 
-from storage.db import get_db
-from storage.games_store import load_game, save_game
-from api.models import *
-from api.game_service import (
+from backend.storage.db import get_db
+from backend.storage.games_store import load_game, save_game
+from backend.api.models import *
+from backend.api.game_service import (
     create_new_game,
     queue_action,
     execute_game_tick,
@@ -15,7 +15,7 @@ from api.game_service import (
     resume_existing_game,
     GameServiceError
 )
-from api.concurrent_limiter import check_concurrent_limit
+from backend.api.concurrent_limiter import check_concurrent_limit
 
 router = APIRouter(prefix="/game", tags=["game"])
 

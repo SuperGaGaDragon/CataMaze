@@ -3,10 +3,10 @@ Observation generation for entities.
 Creates the observation dict that entities see.
 """
 from typing import Dict, Any, Optional, Tuple
-from engine.state import WorldState, EntityState
-from engine.local_map import get_vision_for_entity
-from engine.position import is_in_range
-from engine.constants import SOUND_RANGE
+from backend.engine.state import WorldState, EntityState
+from backend.engine.local_map import get_vision_for_entity
+from backend.engine.position import is_in_range
+from backend.engine.constants import SOUND_RANGE
 
 
 def generate_observation(

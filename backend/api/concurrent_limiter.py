@@ -3,8 +3,8 @@ Concurrent game limiter.
 """
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from storage.games_store import count_games
-from engine.constants import MAX_CONCURRENT_GAMES
+from backend.storage.games_store import count_games
+from backend.engine.constants import MAX_CONCURRENT_GAMES
 
 
 def check_concurrent_limit(db: Session):

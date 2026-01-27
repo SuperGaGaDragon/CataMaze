@@ -5,7 +5,7 @@ import json
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from typing import Optional, List, Dict, Any
-from storage.models import Log
+from backend.storage.models import Log
 
 
 class LogStoreError(Exception):

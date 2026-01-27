@@ -8,9 +8,9 @@ import json
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from engine.state import EntityState, BulletState, WorldState, create_entity
-from engine.state_factory import create_new_state, find_random_walkable_position
-from maps.loader import load_map
+from backend.engine.state import EntityState, BulletState, WorldState, create_entity
+from backend.engine.state_factory import create_new_state, find_random_walkable_position
+from backend.maps.loader import load_map
 
 
 def main():
