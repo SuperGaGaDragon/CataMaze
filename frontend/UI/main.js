@@ -25,30 +25,119 @@ const keyToAction = {
     'space': 'WAIT',
 };
 
-// Placeholder functions (to be implemented in later stages)
+// Game Functions
 async function handleNewGame() {
-    ui.showStatus('Creating new game...', false);
-    // To be implemented in Stage 4B
+    try {
+        ui.showStatus('Creating new game...', false);
+        const response = await api.createGame();
+
+        gameState.gameId = response.game_id;
+        gameState.observation = response.observation;
+        gameState.queueSize = response.queue_size;
+
+        ui.elements.gameIdLabel.textContent = `Game: ${response.game_id.substring(0, 8)}...`;
+        ui.updateHUD(response.observation, response.queue_size);
+        ui.updateVision(response.observation.vision);
+        ui.clearEventLog();
+        ui.addEventToLog('New game created!');
+
+        ui.showStatus('Game started! Use WASD to move, IJKL to shoot.', false);
+    } catch (error) {
+        ui.showStatus(`Error: ${error.message}`, true);
+    }
 }
 
 async function handleObserve() {
-    ui.showStatus('Observing game state...', false);
-    // To be implemented in Stage 4B
+    if (!gameState.gameId) {
+        ui.showStatus('No active game. Create a new game first.', true);
+        return;
+    }
+
+    try {
+        ui.showStatus('Observing game state...', false);
+        const response = await api.observeGame(gameState.gameId);
+
+        gameState.observation = response.observation;
+
+        ui.updateHUD(response.observation, gameState.queueSize);
+        ui.updateVision(response.observation.vision);
+
+        ui.showStatus('Observation updated.', false);
+    } catch (error) {
+        ui.showStatus(`Error: ${error.message}`, true);
+    }
 }
 
 async function handleQueueAction(key) {
-    ui.showStatus(`Queueing action: ${key}...`, false);
-    // To be implemented in Stage 4C
+    if (!gameState.gameId) {
+        ui.showStatus('No active game. Create a new game first.', true);
+        return;
+    }
+
+    const action = keyToAction[key];
+    if (!action) {
+        ui.showStatus(`Invalid key: ${key}`, true);
+        return;
+    }
+
+    try {
+        const response = await api.submitAction(gameState.gameId, action);
+        gameState.queueSize = response.queue_size;
+
+        ui.elements.queueValue.textContent = response.queue_size;
+        ui.showStatus(`Action queued: ${action}. Queue: ${response.queue_size}`, false);
+    } catch (error) {
+        ui.showStatus(`Error: ${error.message}`, true);
+    }
 }
 
 async function handleTick() {
-    ui.showStatus('Executing tick...', false);
-    // To be implemented in Stage 4C
+    if (!gameState.gameId) {
+        ui.showStatus('No active game. Create a new game first.', true);
+        return;
+    }
+
+    try {
+        ui.showStatus('Executing tick...', false);
+        const response = await api.executeTick(gameState.gameId);
+
+        gameState.observation = response.observation;
+        gameState.queueSize = response.queue_size;
+
+        ui.updateHUD(response.observation, response.queue_size);
+        ui.updateVision(response.observation.vision);
+
+        if (response.events && response.events.length > 0) {
+            response.events.forEach(event => ui.addEventToLog(event));
+        }
+
+        ui.showStatus(`Tick ${response.tick} executed. Queue: ${response.queue_size}`, false);
+
+        if (response.observation.game_over) {
+            ui.showGameOverModal(response.observation.won, response.observation.alive);
+        }
+    } catch (error) {
+        ui.showStatus(`Error: ${error.message}`, true);
+    }
 }
 
 async function handleClearQueue() {
-    ui.showStatus('Clearing queue...', false);
-    // To be implemented in Stage 4C
+    if (!gameState.gameId) {
+        ui.showStatus('No active game. Create a new game first.', true);
+        return;
+    }
+
+    try {
+        ui.showStatus('Clearing queue...', false);
+        await api.clearQueue(gameState.gameId);
+
+        gameState.queueSize = 0;
+        ui.elements.queueValue.textContent = 0;
+
+        ui.showStatus('Queue cleared.', false);
+    } catch (error) {
+        ui.showStatus(`Error: ${error.message}`, true);
+    }
 }
 
 // Event Listeners
