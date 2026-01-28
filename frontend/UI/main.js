@@ -209,7 +209,6 @@ ui.elements.btnQueueView.addEventListener('click', () => {
     ui.showStatus(`Queue size: ${gameState.queueSize}`, false);
 });
 ui.elements.btnClearQueue.addEventListener('click', handleClearQueue);
-ui.elements.btnWait.addEventListener('click', () => handleQueueAction('space'));
 ui.elements.btnTick.addEventListener('click', handleTick);
 
 // Movement buttons
