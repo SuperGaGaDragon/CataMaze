@@ -2,8 +2,8 @@
  * CataMaze UI Main Entry Point
  */
 
-import * as api from './api.js';
-import * as ui from './ui.js';
+import * as api from './api.js?v=20260127-2';
+import * as ui from './ui.js?v=20260127-2';
 
 // Game State
 let gameState = {
