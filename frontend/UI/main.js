@@ -10,6 +10,8 @@ let gameState = {
     gameId: null,
     observation: null,
     queueSize: 0,
+    autoWaitEnabled: false,
+    autoWaitInterval: null,
 };
 
 // Key to Action Mapping
@@ -28,6 +30,9 @@ const keyToAction = {
 // Game Functions
 async function handleNewGame() {
     try {
+        // Stop auto-wait if running
+        stopAutoWait();
+
         ui.showStatus('Creating new game...', false);
         const response = await api.createGame();
 
@@ -81,11 +86,29 @@ async function handleQueueAction(key) {
     }
 
     try {
-        const response = await api.submitAction(gameState.gameId, action);
-        gameState.queueSize = response.queue_size;
+        // Submit action
+        const submitResponse = await api.submitAction(gameState.gameId, action);
+        gameState.queueSize = submitResponse.queue_size;
+        ui.elements.queueValue.textContent = submitResponse.queue_size;
+        ui.showStatus(`Executing ${action}...`, false);
 
-        ui.elements.queueValue.textContent = response.queue_size;
-        ui.showStatus(`Action queued: ${action}. Queue: ${response.queue_size}`, false);
+        // Automatically execute tick
+        const tickResponse = await api.executeTick(gameState.gameId);
+        gameState.observation = tickResponse.observation;
+        gameState.queueSize = tickResponse.queue_size;
+
+        ui.updateHUD(tickResponse.observation, tickResponse.queue_size);
+        ui.updateVision(tickResponse.observation.vision);
+
+        if (tickResponse.events && tickResponse.events.length > 0) {
+            tickResponse.events.forEach(event => ui.addEventToLog(event));
+        }
+
+        ui.showStatus(`${action} executed. Tick ${tickResponse.tick}`, false);
+
+        if (tickResponse.observation.game_over) {
+            ui.showGameOverModal(tickResponse.observation.won, tickResponse.observation.alive);
+        }
     } catch (error) {
         ui.showStatus(`Error: ${error.message}`, true);
     }
@@ -121,6 +144,58 @@ async function handleTick() {
     }
 }
 
+function toggleAutoWait() {
+    if (gameState.autoWaitEnabled) {
+        stopAutoWait();
+    } else {
+        startAutoWait();
+    }
+}
+
+function startAutoWait() {
+    if (!gameState.gameId) {
+        ui.showStatus('Create a game first to enable auto-wait.', true);
+        return;
+    }
+
+    gameState.autoWaitEnabled = true;
+    const btn = document.getElementById('btn-auto-wait');
+    if (btn) {
+        btn.textContent = 'Stop Auto-Wait';
+        btn.classList.add('btn-active');
+    }
+
+    // Execute WAIT every 2 seconds
+    gameState.autoWaitInterval = setInterval(async () => {
+        if (gameState.gameId && !gameState.observation?.game_over) {
+            try {
+                await handleQueueAction('space');
+            } catch (error) {
+                console.error('Auto-wait error:', error);
+                stopAutoWait();
+            }
+        } else {
+            stopAutoWait();
+        }
+    }, 2000);
+
+    ui.showStatus('Auto-wait enabled. Game will execute WAIT every 2 seconds.', false);
+}
+
+function stopAutoWait() {
+    gameState.autoWaitEnabled = false;
+    if (gameState.autoWaitInterval) {
+        clearInterval(gameState.autoWaitInterval);
+        gameState.autoWaitInterval = null;
+    }
+
+    const btn = document.getElementById('btn-auto-wait');
+    if (btn) {
+        btn.textContent = 'Auto-Wait Mode';
+        btn.classList.remove('btn-active');
+    }
+}
+
 async function handleClearQueue() {
     if (!gameState.gameId) {
         ui.showStatus('No active game. Create a new game first.', true);
@@ -149,6 +224,12 @@ ui.elements.btnQueueView.addEventListener('click', () => {
 ui.elements.btnClearQueue.addEventListener('click', handleClearQueue);
 ui.elements.btnWait.addEventListener('click', () => handleQueueAction('space'));
 ui.elements.btnTick.addEventListener('click', handleTick);
+
+// Auto-wait button
+const btnAutoWait = document.getElementById('btn-auto-wait');
+if (btnAutoWait) {
+    btnAutoWait.addEventListener('click', toggleAutoWait);
+}
 
 // Movement buttons
 document.querySelectorAll('.btn-move').forEach(btn => {
