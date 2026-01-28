@@ -36,6 +36,19 @@ async def startup_event():
         logger.error(f"✗ Database initialization failed: {e}")
         raise
 
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Clean up resources on application shutdown"""
+    logger.info("Shutting down CataMaze API...")
+
+    # Close database connections gracefully
+    from backend.storage.db import engine
+    try:
+        engine.dispose()
+        logger.info("✓ Database connections closed")
+    except Exception as e:
+        logger.error(f"✗ Error closing database: {e}")
+
 # CORS middleware for frontend
 app.add_middleware(
     CORSMiddleware,

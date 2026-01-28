@@ -14,12 +14,15 @@ DATABASE_URL = os.getenv(
     "sqlite:///./catamaze.db"
 )
 
-# Create engine
+# Create engine with connection pooling settings
 engine = create_engine(
     DATABASE_URL,
-    pool_pre_ping=True,  # Verify connections before using
-    pool_recycle=3600,   # Recycle connections after 1 hour
-    echo=False           # Set to True for SQL logging
+    pool_pre_ping=True,      # Verify connections before using
+    pool_recycle=3600,       # Recycle connections after 1 hour
+    pool_size=5,             # Max number of connections in pool
+    max_overflow=10,         # Max connections beyond pool_size
+    pool_timeout=30,         # Seconds to wait for available connection
+    echo=False               # Set to True for SQL logging
 )
 
 # Session factory
