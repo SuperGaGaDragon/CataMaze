@@ -13,15 +13,15 @@ class ActionMask:
         """Initialize action mask generator"""
         # All possible actions
         self.all_actions = [
-            "move_north",
-            "move_south",
-            "move_east",
-            "move_west",
-            "shoot_north",
-            "shoot_south",
-            "shoot_east",
-            "shoot_west",
-            "wait"
+            "MOVE_UP",
+            "MOVE_DOWN",
+            "MOVE_LEFT",
+            "MOVE_RIGHT",
+            "SHOOT_UP",
+            "SHOOT_DOWN",
+            "SHOOT_LEFT",
+            "SHOOT_RIGHT",
+            "WAIT"
         ]
 
     def get_valid_actions(self, observation: Dict) -> List[str]:
@@ -44,32 +44,32 @@ class ActionMask:
 
         # Dead agents can't act
         if hp <= 0:
-            return ["wait"]
+            return ["WAIT"]
 
         # Check movement actions
         if self._can_move_north(position, vision):
-            valid_actions.append("move_north")
+            valid_actions.append("MOVE_UP")
 
         if self._can_move_south(position, vision):
-            valid_actions.append("move_south")
+            valid_actions.append("MOVE_DOWN")
 
         if self._can_move_east(position, vision):
-            valid_actions.append("move_east")
+            valid_actions.append("MOVE_RIGHT")
 
         if self._can_move_west(position, vision):
-            valid_actions.append("move_west")
+            valid_actions.append("MOVE_LEFT")
 
         # Check shooting actions (need ammo)
         if ammo > 0:
             valid_actions.extend([
-                "shoot_north",
-                "shoot_south",
-                "shoot_east",
-                "shoot_west"
+                "SHOOT_UP",
+                "SHOOT_DOWN",
+                "SHOOT_LEFT",
+                "SHOOT_RIGHT"
             ])
 
         # Wait is always valid
-        valid_actions.append("wait")
+        valid_actions.append("WAIT")
 
         return valid_actions
 
