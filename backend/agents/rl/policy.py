@@ -22,15 +22,15 @@ class Policy:
 
         # Action space
         self.actions = [
-            "move_north",
-            "move_south",
-            "move_east",
-            "move_west",
-            "shoot_north",
-            "shoot_south",
-            "shoot_east",
-            "shoot_west",
-            "wait"
+            "MOVE_UP",
+            "MOVE_DOWN",
+            "MOVE_LEFT",
+            "MOVE_RIGHT",
+            "SHOOT_UP",
+            "SHOOT_DOWN",
+            "SHOOT_LEFT",
+            "SHOOT_RIGHT",
+            "WAIT"
         ]
 
         # Exploration parameters
@@ -118,7 +118,7 @@ class Policy:
             score = 0.0
 
             # Movement actions
-            if action.startswith("move_"):
+            if action.startswith("MOVE_"):
                 score += decision_weights.get("explore", 0.5)
 
                 # Prefer exploration when hp is high
@@ -129,7 +129,7 @@ class Policy:
                     score += decision_weights.get("flee", 0.3)
 
             # Shooting actions
-            elif action.startswith("shoot_"):
+            elif action.startswith("SHOOT_"):
                 score += decision_weights.get("attack", 0.5)
 
                 # Can only shoot if we have ammo
@@ -144,7 +144,7 @@ class Policy:
                     score *= 0.5
 
             # Wait action
-            elif action == "wait":
+            elif action == "WAIT":
                 score += 0.1
 
                 # Prefer waiting when low ammo (to recover)
