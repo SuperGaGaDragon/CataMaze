@@ -10,8 +10,8 @@ let gameState = {
     gameId: null,
     observation: null,
     queueSize: 0,
-    autoWaitEnabled: false,
-    autoWaitInterval: null,
+    autoRunning: false,
+    autoRunInterval: null,
 };
 
 // Key to Action Mapping
@@ -30,8 +30,8 @@ const keyToAction = {
 // Game Functions
 async function handleNewGame() {
     try {
-        // Stop auto-wait if running
-        stopAutoWait();
+        // Stop previous game if running
+        stopAutoRun();
 
         ui.showStatus('Creating new game...', false);
         const response = await api.createGame();
@@ -45,8 +45,12 @@ async function handleNewGame() {
         ui.updateVision(response.observation.vision);
         ui.clearEventLog();
         ui.addEventToLog('New game created!');
+        ui.addEventToLog('Game is running automatically. Click buttons to take actions.');
 
-        ui.showStatus('Game started! Use WASD to move, IJKL to shoot.', false);
+        ui.showStatus('Game running. Use WASD to move, IJKL to shoot.', false);
+
+        // Start auto-running (automatic WAIT every 2 seconds)
+        startAutoRun();
     } catch (error) {
         ui.showStatus(`Error: ${error.message}`, true);
     }
@@ -73,15 +77,13 @@ async function handleObserve() {
     }
 }
 
-async function handleQueueAction(key) {
+async function handleQueueAction(key, isAutoWait = false) {
     if (!gameState.gameId) {
-        ui.showStatus('No active game. Create a new game first.', true);
         return;
     }
 
     const action = keyToAction[key];
     if (!action) {
-        ui.showStatus(`Invalid key: ${key}`, true);
         return;
     }
 
@@ -90,7 +92,10 @@ async function handleQueueAction(key) {
         const submitResponse = await api.submitAction(gameState.gameId, action);
         gameState.queueSize = submitResponse.queue_size;
         ui.elements.queueValue.textContent = submitResponse.queue_size;
-        ui.showStatus(`Executing ${action}...`, false);
+
+        if (!isAutoWait) {
+            ui.showStatus(`Executing ${action}...`, false);
+        }
 
         // Automatically execute tick
         const tickResponse = await api.executeTick(gameState.gameId);
@@ -104,13 +109,17 @@ async function handleQueueAction(key) {
             tickResponse.events.forEach(event => ui.addEventToLog(event));
         }
 
-        ui.showStatus(`${action} executed. Tick ${tickResponse.tick}`, false);
+        if (!isAutoWait) {
+            ui.showStatus(`${action} executed. Tick ${tickResponse.tick}`, false);
+        }
 
         if (tickResponse.observation.game_over) {
+            stopAutoRun();
             ui.showGameOverModal(tickResponse.observation.won, tickResponse.observation.alive);
         }
     } catch (error) {
         ui.showStatus(`Error: ${error.message}`, true);
+        stopAutoRun();
     }
 }
 
@@ -144,55 +153,33 @@ async function handleTick() {
     }
 }
 
-function toggleAutoWait() {
-    if (gameState.autoWaitEnabled) {
-        stopAutoWait();
-    } else {
-        startAutoWait();
-    }
-}
-
-function startAutoWait() {
+function startAutoRun() {
     if (!gameState.gameId) {
-        ui.showStatus('Create a game first to enable auto-wait.', true);
         return;
     }
 
-    gameState.autoWaitEnabled = true;
-    const btn = document.getElementById('btn-auto-wait');
-    if (btn) {
-        btn.textContent = 'Stop Auto-Wait';
-        btn.classList.add('btn-active');
-    }
+    gameState.autoRunning = true;
 
-    // Execute WAIT every 2 seconds
-    gameState.autoWaitInterval = setInterval(async () => {
-        if (gameState.gameId && !gameState.observation?.game_over) {
+    // Execute WAIT every 2 seconds automatically
+    gameState.autoRunInterval = setInterval(async () => {
+        if (gameState.gameId && gameState.observation && !gameState.observation.game_over) {
             try {
-                await handleQueueAction('space');
+                await handleQueueAction('space', true); // true = silent auto-wait
             } catch (error) {
-                console.error('Auto-wait error:', error);
-                stopAutoWait();
+                console.error('Auto-run error:', error);
+                stopAutoRun();
             }
         } else {
-            stopAutoWait();
+            stopAutoRun();
         }
     }, 2000);
-
-    ui.showStatus('Auto-wait enabled. Game will execute WAIT every 2 seconds.', false);
 }
 
-function stopAutoWait() {
-    gameState.autoWaitEnabled = false;
-    if (gameState.autoWaitInterval) {
-        clearInterval(gameState.autoWaitInterval);
-        gameState.autoWaitInterval = null;
-    }
-
-    const btn = document.getElementById('btn-auto-wait');
-    if (btn) {
-        btn.textContent = 'Auto-Wait Mode';
-        btn.classList.remove('btn-active');
+function stopAutoRun() {
+    gameState.autoRunning = false;
+    if (gameState.autoRunInterval) {
+        clearInterval(gameState.autoRunInterval);
+        gameState.autoRunInterval = null;
     }
 }
 
@@ -224,12 +211,6 @@ ui.elements.btnQueueView.addEventListener('click', () => {
 ui.elements.btnClearQueue.addEventListener('click', handleClearQueue);
 ui.elements.btnWait.addEventListener('click', () => handleQueueAction('space'));
 ui.elements.btnTick.addEventListener('click', handleTick);
-
-// Auto-wait button
-const btnAutoWait = document.getElementById('btn-auto-wait');
-if (btnAutoWait) {
-    btnAutoWait.addEventListener('click', toggleAutoWait);
-}
 
 // Movement buttons
 document.querySelectorAll('.btn-move').forEach(btn => {
