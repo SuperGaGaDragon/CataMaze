@@ -94,15 +94,9 @@ function handleContinuePlaying() {
 function handleExitToMenu() {
     stopAutoTick();
     ui.hidePauseSaveModal();
-    ui.setGameUIState(false);
 
-    gameState.gameId = null;
-    gameState.observation = null;
-    gameState.queueSize = 0;
-
-    ui.elements.gameIdLabel.textContent = 'No active game';
-    ui.clearEventLog();
-    ui.showStatus('Game saved. Resume anytime with your Game ID.', false);
+    // Refresh browser to return to main menu
+    window.location.reload();
 }
 
 async function handleObserve() {
