@@ -58,18 +58,12 @@ class GameEngine:
         for entity_id, agent in self.agents.items():
             entity = self.world.entities.get(entity_id)
             if entity and entity.alive and not self.world.game_over:
-                try:
-                    # Generate observation for this agent
-                    obs = generate_observation(self.world, entity_id)
-                    # Let agent decide action
-                    action = agent.decide_action(obs)
-                    # Queue the action
-                    entity.action_queue.append(action)
-                    print(f"DEBUG: {entity_id} decided action: {action}")
-                except Exception as e:
-                    print(f"ERROR: Agent {entity_id} failed to decide action: {e}")
-                    import traceback
-                    traceback.print_exc()
+                # Generate observation for this agent
+                obs = generate_observation(self.world, entity_id)
+                # Let agent decide action
+                action = agent.decide_action(obs)
+                # Queue the action
+                entity.action_queue.append(action)
 
         # Phase 1: Pop actions from queues
         entity_actions = {}
