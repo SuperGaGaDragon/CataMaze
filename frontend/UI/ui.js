@@ -28,18 +28,32 @@ export const elements = {
 
     // Buttons
     btnNewGame: document.getElementById('btn-new-game'),
+    btnResumeShow: document.getElementById('btn-resume-show'),
+    btnPauseSave: document.getElementById('btn-pause-save'),
     btnObserve: document.getElementById('btn-observe'),
     btnQueueView: document.getElementById('btn-queue-view'),
     btnClearQueue: document.getElementById('btn-clear-queue'),
-    btnWait: document.getElementById('btn-wait'),
     btnTick: document.getElementById('btn-tick'),
 
-    // Modal
+    // Resume section
+    resumeSection: document.getElementById('resume-section'),
+    inputGameId: document.getElementById('input-game-id'),
+    btnResumeConfirm: document.getElementById('btn-resume-confirm'),
+    btnResumeCancel: document.getElementById('btn-resume-cancel'),
+
+    // Game Over Modal
     modal: document.getElementById('game-over-modal'),
     modalTitle: document.getElementById('modal-title'),
     modalMessage: document.getElementById('modal-message'),
     modalBtnNew: document.getElementById('modal-btn-new'),
     modalBtnClose: document.getElementById('modal-btn-close'),
+
+    // Pause & Save Modal
+    pauseModal: document.getElementById('pause-save-modal'),
+    savedGameId: document.getElementById('saved-game-id'),
+    btnCopyId: document.getElementById('btn-copy-id'),
+    modalBtnContinue: document.getElementById('modal-btn-continue'),
+    modalBtnExit: document.getElementById('modal-btn-exit'),
 };
 
 // Initialize Vision Grid
@@ -142,4 +156,40 @@ export function showGameOverModal(won, alive) {
 // Hide Modal
 export function hideModal() {
     elements.modal.classList.remove('show');
+}
+
+// Show Pause & Save Modal
+export function showPauseSaveModal(gameId) {
+    elements.savedGameId.value = gameId;
+    elements.pauseModal.classList.add('show');
+}
+
+// Hide Pause & Save Modal
+export function hidePauseSaveModal() {
+    elements.pauseModal.classList.remove('show');
+}
+
+// Show Resume Section
+export function showResumeSection() {
+    elements.resumeSection.style.display = 'block';
+    elements.inputGameId.value = '';
+    elements.inputGameId.focus();
+}
+
+// Hide Resume Section
+export function hideResumeSection() {
+    elements.resumeSection.style.display = 'none';
+}
+
+// Toggle Game UI State
+export function setGameUIState(isPlaying) {
+    if (isPlaying) {
+        elements.btnNewGame.style.display = 'none';
+        elements.btnResumeShow.style.display = 'none';
+        elements.btnPauseSave.style.display = 'block';
+    } else {
+        elements.btnNewGame.style.display = 'block';
+        elements.btnResumeShow.style.display = 'block';
+        elements.btnPauseSave.style.display = 'none';
+    }
 }

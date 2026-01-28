@@ -80,9 +80,18 @@
             <div class="control-section">
                 <h3>Game Controls</h3>
                 <button class="btn btn-primary" id="btn-new-game">New Game</button>
+                <button class="btn btn-secondary" id="btn-resume-show">Resume Game</button>
+                <button class="btn btn-warning" id="btn-pause-save" style="display: none;">Pause & Save</button>
                 <button class="btn btn-secondary" id="btn-observe">Observe</button>
-                <button class="btn btn-secondary" id="btn-queue-view">View Queue</button>
                 <button class="btn btn-danger" id="btn-clear-queue">Clear Queue (ESC)</button>
+            </div>
+
+            <div class="control-section" id="resume-section" style="display: none;">
+                <h3>Resume Game</h3>
+                <input type="text" id="input-game-id" placeholder="Enter Game ID..." class="input-game-id">
+                <button class="btn btn-primary" id="btn-resume-confirm">Load Game</button>
+                <button class="btn btn-secondary" id="btn-resume-cancel">Cancel</button>
+                <p class="warning-text">⚠️ Keep your Game ID secret! Anyone with it can control your game.</p>
             </div>
 
             <div class="control-section">
@@ -137,6 +146,22 @@
         </div>
     </div>
 
-    <script src="main.js?v=20260127-3" type="module"></script>
+    <!-- Pause & Save Modal -->
+    <div class="modal" id="pause-save-modal">
+        <div class="modal-content">
+            <h2>⏸️ Game Paused & Saved</h2>
+            <p>Your game has been automatically saved.</p>
+            <div class="game-id-box">
+                <label>Your Game ID:</label>
+                <input type="text" id="saved-game-id" readonly class="game-id-input">
+                <button class="btn btn-small" id="btn-copy-id">📋 Copy</button>
+            </div>
+            <p class="warning-text">⚠️ <strong>Keep this ID secret!</strong> Anyone with this ID can resume and control your game.</p>
+            <button class="btn btn-primary" id="modal-btn-continue">Continue Playing</button>
+            <button class="btn btn-secondary" id="modal-btn-exit">Exit to Menu</button>
+        </div>
+    </div>
+
+    <script src="main.js?v=20260127-4" type="module"></script>
 </body>
 </html>

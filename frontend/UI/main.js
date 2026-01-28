@@ -2,8 +2,8 @@
  * CataMaze UI Main Entry Point
  */
 
-import * as api from './api.js?v=20260127-3';
-import * as ui from './ui.js?v=20260127-3';
+import * as api from './api.js?v=20260127-4';
+import * as ui from './ui.js?v=20260127-4';
 
 // Game State
 let gameState = {
@@ -36,24 +36,73 @@ async function handleNewGame() {
         ui.showStatus('Creating new game...', false);
         const response = await api.createGame();
 
-        gameState.gameId = response.game_id;
-        gameState.observation = response.observation;
-        gameState.queueSize = response.queue_size;
-
-        ui.elements.gameIdLabel.textContent = `Game: ${response.game_id.substring(0, 8)}...`;
-        ui.updateHUD(response.observation, response.queue_size);
-        ui.updateVision(response.observation.vision);
-        ui.clearEventLog();
-        ui.addEventToLog('New game created!');
-        ui.addEventToLog('Game runs automatically (1 tick/second). Queue actions with WASD/IJKL.');
-
-        ui.showStatus('Game running. Queue: 0', false);
-
-        // Start automatic tick execution (1 tick per second)
-        startAutoTick();
+        startGame(response);
     } catch (error) {
         ui.showStatus(`Error: ${error.message}`, true);
     }
+}
+
+async function handleResumeGame(gameId) {
+    try {
+        ui.showStatus('Resuming game...', false);
+        const response = await api.resumeGame(gameId);
+
+        startGame(response);
+        ui.addEventToLog(`Game resumed from tick ${response.observation.time}`);
+    } catch (error) {
+        ui.showStatus(`Error: ${error.message}`, true);
+    }
+}
+
+function startGame(response) {
+    gameState.gameId = response.game_id;
+    gameState.observation = response.observation;
+    gameState.queueSize = response.queue_size;
+
+    ui.elements.gameIdLabel.textContent = `Game: ${response.game_id.substring(0, 8)}...`;
+    ui.updateHUD(response.observation, response.queue_size);
+    ui.updateVision(response.observation.vision);
+    ui.clearEventLog();
+    ui.addEventToLog('Game started!');
+    ui.addEventToLog('Game runs automatically (1 tick/second). Queue actions with WASD/IJKL.');
+
+    ui.showStatus('Game running. Queue: 0', false);
+    ui.setGameUIState(true);
+    ui.hideResumeSection();
+
+    // Start automatic tick execution (1 tick per second)
+    startAutoTick();
+}
+
+function handlePauseSave() {
+    if (!gameState.gameId) {
+        ui.showStatus('No active game to pause.', true);
+        return;
+    }
+
+    stopAutoTick();
+    ui.showPauseSaveModal(gameState.gameId);
+}
+
+function handleContinuePlaying() {
+    ui.hidePauseSaveModal();
+    if (gameState.gameId) {
+        startAutoTick();
+    }
+}
+
+function handleExitToMenu() {
+    stopAutoTick();
+    ui.hidePauseSaveModal();
+    ui.setGameUIState(false);
+
+    gameState.gameId = null;
+    gameState.observation = null;
+    gameState.queueSize = 0;
+
+    ui.elements.gameIdLabel.textContent = 'No active game';
+    ui.clearEventLog();
+    ui.showStatus('Game saved. Resume anytime with your Game ID.', false);
 }
 
 async function handleObserve() {
@@ -207,11 +256,41 @@ async function handleClearQueue() {
 
 // Event Listeners
 ui.elements.btnNewGame.addEventListener('click', handleNewGame);
-ui.elements.btnObserve.addEventListener('click', handleObserve);
-ui.elements.btnQueueView.addEventListener('click', () => {
-    ui.showStatus(`Queue size: ${gameState.queueSize}`, false);
+
+ui.elements.btnResumeShow.addEventListener('click', () => {
+    ui.showResumeSection();
 });
+
+ui.elements.btnResumeConfirm.addEventListener('click', () => {
+    const gameId = ui.elements.inputGameId.value.trim();
+    if (gameId) {
+        handleResumeGame(gameId);
+    } else {
+        ui.showStatus('Please enter a Game ID', true);
+    }
+});
+
+ui.elements.btnResumeCancel.addEventListener('click', () => {
+    ui.hideResumeSection();
+});
+
+ui.elements.btnPauseSave.addEventListener('click', handlePauseSave);
+
+ui.elements.btnCopyId.addEventListener('click', () => {
+    const gameId = ui.elements.savedGameId.value;
+    navigator.clipboard.writeText(gameId).then(() => {
+        ui.showStatus('Game ID copied to clipboard!', false);
+    });
+});
+
+ui.elements.modalBtnContinue.addEventListener('click', handleContinuePlaying);
+
+ui.elements.modalBtnExit.addEventListener('click', handleExitToMenu);
+
+ui.elements.btnObserve.addEventListener('click', handleObserve);
+
 ui.elements.btnClearQueue.addEventListener('click', handleClearQueue);
+
 ui.elements.btnTick.addEventListener('click', handleTick);
 
 // Movement buttons
