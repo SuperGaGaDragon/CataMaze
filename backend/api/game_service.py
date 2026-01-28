@@ -83,6 +83,7 @@ def execute_game_tick(db: Session, game_id: str) -> Dict[str, Any]:
             if entity.entity_type == "agent" and entity.alive:
                 # Create RL agent with persona
                 agents[entity_id] = create_agent("rl", entity_id, entity.persona)
+                print(f"DEBUG: Created agent {entity_id} with persona {entity.persona}")
 
         engine = GameEngine(world, agents)
         result = engine.tick()
