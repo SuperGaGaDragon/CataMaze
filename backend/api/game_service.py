@@ -10,6 +10,7 @@ from backend.engine.observation import generate_observation
 from backend.engine.actions import is_valid_action
 from backend.storage.games_store import save_game, load_game, GameStoreError
 from backend.storage.log_store import append_logs_batch, LogStoreError
+from backend.agents.registry import create_agent
 
 
 class GameServiceError(Exception):
@@ -76,7 +77,14 @@ def execute_game_tick(db: Session, game_id: str) -> Dict[str, Any]:
         if world.game_over:
             raise GameServiceError("Game is already over")
 
-        engine = GameEngine(world)
+        # Create AI agent instances for non-player entities
+        agents = {}
+        for entity_id, entity in world.entities.items():
+            if entity.entity_type == "agent" and entity.alive:
+                # Create RL agent with persona
+                agents[entity_id] = create_agent("rl", entity_id, entity.persona)
+
+        engine = GameEngine(world, agents)
         result = engine.tick()
 
         save_game(db, world)

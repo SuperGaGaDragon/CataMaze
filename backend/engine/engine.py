@@ -19,14 +19,16 @@ class GameEngine:
     Core game engine managing world state and tick execution.
     """
 
-    def __init__(self, world: WorldState):
+    def __init__(self, world: WorldState, agents: Optional[Dict[str, any]] = None):
         """
-        Initialize engine with a world state.
+        Initialize engine with a world state and agents.
 
         Args:
             world: Initial world state
+            agents: Dict mapping entity_id to Agent instance (for AI agents)
         """
         self.world = world
+        self.agents = agents or {}
         self.events: List[str] = []
 
     def log_event(self, event: str):
@@ -36,6 +38,7 @@ class GameEngine:
     def tick(self) -> Dict[str, any]:
         """
         Execute one game tick.
+        - Let AI agents decide actions
         - Pop one action from each entity's queue
         - Execute all actions
         - Resolve bullets
@@ -50,6 +53,17 @@ class GameEngine:
 
         # Record shot positions for sound generation
         shot_positions = []
+
+        # Phase 0: Let AI agents decide actions and queue them
+        for entity_id, agent in self.agents.items():
+            entity = self.world.entities.get(entity_id)
+            if entity and entity.alive and not self.world.game_over:
+                # Generate observation for this agent
+                obs = generate_observation(self.world, entity_id)
+                # Let agent decide action
+                action = agent.decide_action(obs)
+                # Queue the action
+                entity.action_queue.append(action)
 
         # Phase 1: Pop actions from queues
         entity_actions = {}

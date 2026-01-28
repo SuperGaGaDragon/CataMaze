@@ -4,11 +4,13 @@ Agent Registry - register and load agents
 from typing import Dict, Type, Optional
 from backend.agents.base import Agent
 from backend.agents.human import HumanAgent
+from backend.agents.rl.agent import RLAgent
 
 
 # Agent registry
 _AGENT_REGISTRY: Dict[str, Type[Agent]] = {
     "human": HumanAgent,
+    "rl": RLAgent,
 }
 
 
